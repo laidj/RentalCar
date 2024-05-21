@@ -1,28 +1,29 @@
 function calculateTotalPriceAndCheckIfValid(pickupDate, dropOffDate, carType, driverAge, ageOfLicense) {
-
     const rentalDays = getrentalDays(pickupDate, dropOffDate);
     const Season = highSeason(pickupDate, dropOffDate);
     const currentYear = new Date().getFullYear();
 
+    // Check driver eligibility
     if (driverIsTooYoung(driverAge)) {
-
         return "Driver is too young - cannot give the price";
     }
 
     if (restrictedDriver(driverAge, carType)) {
-
         return "Drivers 21 or less can only rent Compact vehicles";
-
     }
+
     if ((currentYear - ageOfLicense) < 1) {
-        return "Individuals holding a drivers license for less than a year cannot to rent."
+        return "Individuals holding a driver's license for less than a year cannot rent.";
     }
 
+    // Calculate base price
     const basePrice = calculateBasePrice(driverAge, rentalDays);
+
+    // Calculate any extra charges based on driver's age, car type, etc.
     const rentalPrice = calculateExtraCharge(basePrice, carType, currentYear, ageOfLicense, rentalDays, Season, driverAge);
 
-    return (rentalPrice + '$');
-
+    // Return the total rental price
+    return rentalPrice + "$";
 }
 
 function calculateBasePrice(driverAge, rentalDays) {
@@ -108,5 +109,24 @@ function highSeason(pickupDate, dropOffDate) {
     }
     return false;
 }
+
+function calculateRentalPrice(startDate, endDate, basePrice) {
+    let totalPrice = 0;
+    let currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+        if (currentDate.getDay() === 6 || currentDate.getDay() === 0) { // Saturday or Sunday
+            totalPrice += basePrice * 1.05;
+        } else { // Weekday
+            totalPrice += basePrice;
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return totalPrice;
+}
+
+module.exports = {  calculateTotalPriceAndCheckIfValid, calculateRentalPrice };
+
 
 exports.calculateTotalPriceAndCheckIfValid = calculateTotalPriceAndCheckIfValid;

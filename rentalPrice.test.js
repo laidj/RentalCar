@@ -9,12 +9,14 @@ describe('Testing if driver even elligble to rent',() => {
 
     test('Driver under 18 cannot rent a car', () => {
         expect(rental.calculateTotalPriceAndCheckIfValid('2024-01-01', '2024-02-02', 'Compact', 15, 2020))
-        .toBe('Driver too young - cannot give the price');
+        .toBe('Driver is too young - cannot give the price');
+
     });
     
     test('Drivers with a license that is less than a year cant rent', () => {
         expect(rental.calculateTotalPriceAndCheckIfValid('2024-01-01', '2024-02-02', 'Compact', 25, 2024))
-        .toBe('Individuals holding a drivers license for less than a year cannot to rent.')
+        .toBe("Individuals holding a driver's license for less than a year cannot rent.");
+
     });
 
 });
@@ -51,4 +53,30 @@ describe('Testing rental pricing logic',() => {
         .toBe('1200$')
     });
 
+});
+
+describe('Rental Price Calculation', () => {
+    const basePrice = 50;
+
+    test('should calculate price for weekdays correctly', () => {
+        const startDate = new Date(2024, 4, 20); // Monday
+        const endDate = new Date(2024, 4, 22); // Wednesday
+        const totalPrice = rental.calculateRentalPrice(startDate, endDate, basePrice); // Adjusted here
+        expect(totalPrice).toBe(150); // 50 * 3
+    });
+
+    test('should calculate price for weekend correctly', () => {
+        const startDate = new Date(2024, 4, 23); // Thursday
+        const endDate = new Date(2024, 4, 25); // Saturday
+        const totalPrice = rental.calculateRentalPrice(startDate, endDate, basePrice); // Adjusted here
+        expect(totalPrice).toBe(152.50); // 50 * 2 + 52.50 (50 * 1.05)
+    });
+
+    test('should calculate price for mixed days correctly', () => {
+        const startDate = new Date(2024, 4, 23); // Thursday
+        const endDate = new Date(2024, 4, 26); // Sunday
+        const totalPrice = rental.calculateRentalPrice(startDate, endDate, basePrice); // Adjusted here
+        const expectedPrice = 50 * 2 + 50 * 1.05 * 2; // Thursday, Friday, Saturday, Sunday
+        expect(totalPrice).toBe(expectedPrice);
+    });
 });
